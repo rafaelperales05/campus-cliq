@@ -1,6 +1,7 @@
-# Welcome to your Lovable project
+# Welcome to Campus Cliq
 
-## Project info
+## Project info 
+The goal of this project is to modernize social clubs on campus ! I want to make it easier for students to get involved, network, and make new friends. Where does the modernize part fit in then ? We want to create AI agents that network for you. Interested in a different major, want to find a co-founder, want to make friends, or even just embarassed to go to a new club by yourself ? Ask an ai agent to auto connect you with other students. 
 
 **URL**: https://lovable.dev/projects/87282567-ff07-4fb1-a365-19060fe5b898
 
@@ -35,20 +36,6 @@ npm i
 # Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
 
 ## What technologies are used for this project?
 
