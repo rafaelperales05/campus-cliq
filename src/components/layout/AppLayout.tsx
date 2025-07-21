@@ -1,3 +1,5 @@
+// src/components/layout/AppLayout.tsx (Updated)
+
 import { Navigation } from "@/components/ui/navigation";
 
 interface AppLayoutProps {
