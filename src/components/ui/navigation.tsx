@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Bell, Home, Calendar, Users, User, Search, Menu, X } from "lucide-react";
+import { Bell, Home, Calendar, Users, User, Search, Menu, X, UserPlus2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ const navItems = [
   { icon: Users, label: "Clubs", path: "/clubs" },
   { icon: Calendar, label: "Events", path: "/events" },
   { icon: User, label: "Profile", path: "/profile" },
+  { icon: UserPlus2, label: "Connect", path: "/connect" },
 ];
 
 export function Navigation() {
