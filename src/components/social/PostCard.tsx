@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { sanitizeUserContent } from "@/lib/sanitize";
 
 interface Post {
   id: string;
@@ -68,7 +69,12 @@ export function PostCard({ post }: PostCardProps) {
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        <p className="text-sm mb-4 leading-relaxed">{post.content}</p>
+        <div 
+          className="text-sm mb-4 leading-relaxed"
+          dangerouslySetInnerHTML={{ 
+            __html: sanitizeUserContent(post.content) 
+          }}
+        />
         
         <div className="flex items-center justify-between pt-2 border-t border-border">
           <div className="flex items-center space-x-4">
