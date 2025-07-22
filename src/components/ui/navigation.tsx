@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Bell, Home, Calendar, Users, User, Search, Menu, X } from "lucide-react";
+import { Bell, Home, Calendar, Users, User, Search, Menu, X, Settings, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { sanitizeSearchQuery } from "@/lib/sanitize";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
   { icon: Home, label: "Feed", path: "/" },
@@ -18,6 +19,7 @@ export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
+  const { user, isAdmin, logout } = useAuth();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -88,6 +90,25 @@ export function Navigation() {
                 3
               </Badge>
             </Button>
+            
+            {/* Admin Controls */}
+            {isAdmin() && (
+              <Button variant="ghost" size="icon" asChild>
+                <Link to="/admin">
+                  <Shield className="w-5 h-5" />
+                </Link>
+              </Button>
+            )}
+            
+            {/* User Menu */}
+            <div className="flex items-center space-x-2">
+              <Button variant="ghost" size="sm" className="text-sm">
+                {user?.name}
+              </Button>
+              <Button variant="outline" size="sm" onClick={logout}>
+                Logout
+              </Button>
+            </div>
           </div>
 
           {/* Mobile menu button */}

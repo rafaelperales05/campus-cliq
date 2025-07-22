@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Plus, TrendingUp, Users, Calendar } from "lucide-react";
+import { Plus, TrendingUp, Users, Calendar, Shield, Settings } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,6 +11,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PostCard } from "@/components/social/PostCard";
 import { EventCard } from "@/components/events/EventCard";
 import { Badge } from "@/components/ui/badge";
+import { AdminRequestForm } from "@/components/admin/AdminRequestForm";
+import { useAuth } from "@/contexts/AuthContext";
 import { sanitizeUserContent } from "@/lib/sanitize";
 
 const mockPosts = [
@@ -114,6 +116,9 @@ type PostFormData = z.infer<typeof postSchema>;
 
 export default function Dashboard() {
   const [apiError, setApiError] = useState<string | null>(null);
+  const [showAdminRequest, setShowAdminRequest] = useState(false);
+  const { user, isAdmin, hasRole } = useAuth();
+  
   const {
     register,
     handleSubmit,
@@ -151,6 +156,21 @@ export default function Dashboard() {
       toast.error(errorMessage);
     }
   };
+
+  // Show admin request form if requested
+  if (showAdminRequest) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Request Admin Privileges</h1>
+          <Button variant="outline" onClick={() => setShowAdminRequest(false)}>
+            Back to Dashboard
+          </Button>
+        </div>
+        <AdminRequestForm onSuccess={() => setShowAdminRequest(false)} />
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -245,6 +265,58 @@ export default function Dashboard() {
             {upcomingEvents.map((event) => (
               <EventCard key={event.id} event={event} />
             ))}
+          </CardContent>
+        </Card>
+
+        {/* Role-based Actions */}
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center">
+              <Settings className="w-5 h-5 mr-2 text-primary" />
+              Quick Actions
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {/* Super Admin Exclusive Actions */}
+            {hasRole('superAdmin') && (
+              <>
+                <Button variant="outline" className="w-full justify-start" size="sm">
+                  <Shield className="w-4 h-4 mr-2" />
+                  Moderate Content
+                </Button>
+                <Button variant="outline" className="w-full justify-start" size="sm">
+                  <Users className="w-4 h-4 mr-2" />
+                  Manage Users
+                </Button>
+              </>
+            )}
+            
+            {/* Actions for Club Admins and above */}
+            {hasRole('clubAdmin') && (
+              <Button variant="outline" className="w-full justify-start" size="sm">
+                <Calendar className="w-4 h-4 mr-2" />
+                Create Event
+              </Button>
+            )}
+            
+            {/* Actions for Students only */}
+            {user?.role === 'student' && (
+              <Button 
+                variant="outline" 
+                className="w-full justify-start" 
+                size="sm"
+                onClick={() => setShowAdminRequest(true)}
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                Request Admin Role
+              </Button>
+            )}
+            
+            {/* Universal Actions */}
+            <Button variant="outline" className="w-full justify-start" size="sm">
+              <Settings className="w-4 h-4 mr-2" />
+              Account Settings
+            </Button>
           </CardContent>
         </Card>
       </div>
