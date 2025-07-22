@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { sanitizeSearchQuery } from "@/lib/sanitize";
 
 const navItems = [
   { icon: Home, label: "Feed", path: "/" },
@@ -15,7 +16,22 @@ const navItems = [
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const sanitizedQuery = sanitizeSearchQuery(value);
+    setSearchQuery(sanitizedQuery);
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // TODO: Implement search functionality
+      console.log('Searching for:', searchQuery);
+    }
+  };
 
   return (
     <nav className="bg-background border-b border-border sticky top-0 z-50 backdrop-blur-sm bg-background/80">
@@ -56,13 +72,16 @@ export function Navigation() {
 
           {/* Search and Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <div className="relative">
+            <form onSubmit={handleSearchSubmit} className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
                 placeholder="Search clubs, events..."
                 className="pl-10 w-64"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                maxLength={100}
               />
-            </div>
+            </form>
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="w-5 h-5" />
               <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 text-xs p-0 flex items-center justify-center">
@@ -107,13 +126,16 @@ export function Navigation() {
                 );
               })}
               <div className="pt-2 border-t border-border">
-                <div className="relative">
+                <form onSubmit={handleSearchSubmit} className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                   <Input
                     placeholder="Search clubs, events..."
                     className="pl-10"
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    maxLength={100}
                   />
-                </div>
+                </form>
               </div>
             </div>
           </div>

@@ -1,11 +1,17 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { toast } from "sonner";
 import { Plus, TrendingUp, Users, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PostCard } from "@/components/social/PostCard";
 import { EventCard } from "@/components/events/EventCard";
 import { Badge } from "@/components/ui/badge";
+import { sanitizeUserContent } from "@/lib/sanitize";
 
 const mockPosts = [
   {
@@ -96,13 +102,53 @@ const upcomingEvents = [
   }
 ];
 
-export default function Dashboard() {
-  const [newPost, setNewPost] = useState("");
+const postSchema = z.object({
+  content: z
+    .string()
+    .trim()
+    .min(1, 'Post cannot be empty')
+    .max(1000, 'Post must be less than 1000 characters'),
+});
 
-  const handlePost = () => {
-    if (newPost.trim()) {
-      // Handle posting logic here
-      setNewPost("");
+type PostFormData = z.infer<typeof postSchema>;
+
+export default function Dashboard() {
+  const [apiError, setApiError] = useState<string | null>(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<PostFormData>({
+    resolver: zodResolver(postSchema),
+  });
+
+  const onSubmit = async (data: PostFormData) => {
+    setApiError(null); // Clear previous API errors
+    try {
+      const sanitizedContent = sanitizeUserContent(data.content);
+      console.log('Posting sanitized content:', sanitizedContent);
+
+      // TODO: Replace with your actual API call
+      const response = await fetch('/api/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: sanitizedContent }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create post.');
+      }
+
+      toast.success('Post created successfully!');
+      reset({ content: '' });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'An unexpected error occurred.';
+      setApiError(errorMessage);
+      toast.error(errorMessage);
     }
   };
 
@@ -116,22 +162,34 @@ export default function Dashboard() {
             <CardTitle className="text-lg">Share with your community</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Textarea
-              placeholder="What's on your mind? Share updates, ask questions, or start a discussion..."
-              value={newPost}
-              onChange={(e) => setNewPost(e.target.value)}
-              className="min-h-20 resize-none"
-            />
-            <div className="flex justify-between items-center">
-              <div className="flex space-x-2">
-                <Badge variant="outline" className="text-xs">Computer Science</Badge>
-                <Badge variant="outline" className="text-xs">Junior</Badge>
+            {/* Display API error if it exists */}
+            {apiError && (
+              <Alert variant="destructive">
+                <AlertDescription>{apiError}</AlertDescription>
+              </Alert>
+            )}
+            
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <Textarea
+                placeholder="What's on your mind? Share updates, ask questions, or start a discussion..."
+                className="min-h-20 resize-none"
+                {...register('content')}
+              />
+              {errors.content && (
+                <p className="text-sm text-destructive">{errors.content.message}</p>
+              )}
+              
+              <div className="flex justify-between items-center">
+                <div className="flex space-x-2">
+                  <Badge variant="outline" className="text-xs">Computer Science</Badge>
+                  <Badge variant="outline" className="text-xs">Junior</Badge>
+                </div>
+                <Button type="submit" disabled={isSubmitting}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  {isSubmitting ? 'Posting...' : 'Post'}
+                </Button>
               </div>
-              <Button onClick={handlePost} disabled={!newPost.trim()}>
-                <Plus className="w-4 h-4 mr-2" />
-                Post
-              </Button>
-            </div>
+            </form>
           </CardContent>
         </Card>
 
